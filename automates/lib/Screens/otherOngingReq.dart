@@ -1,3 +1,4 @@
+import 'package:automates/Screens/ConformReq.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,13 +11,12 @@ class OtherOngoingReq extends StatefulWidget {
 }
 
 class _OtherOngoingReqState extends State<OtherOngoingReq> {
-  late String currentUserID =
-      ''; // Declare currentUserID as late and initialize it
+  late String currentUserID = '';
 
   @override
   void initState() {
     super.initState();
-    initializeCurrentUser(); // Call a method to initialize currentUserID
+    initializeCurrentUser();
   }
 
   void initializeCurrentUser() {
@@ -25,9 +25,6 @@ class _OtherOngoingReqState extends State<OtherOngoingReq> {
       setState(() {
         currentUserID = user.uid;
       });
-    } else {
-      // Handle the case where user is null
-      // currentUserID = ''; // You can choose to set a default value or handle the error differently
     }
   }
 
@@ -37,20 +34,18 @@ class _OtherOngoingReqState extends State<OtherOngoingReq> {
       appBar: AppBar(
         title: Text('Other Ongoing Requests'),
       ),
-      body: FutureBuilder(
-        future: FirebaseAuth.instance.authStateChanges().first,
-        builder: (context, AsyncSnapshot<User?> snapshot) {
+      body: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasData) {
-            String currentUserID = FirebaseAuth
-                .instance.currentUser!.uid; // Get the current user's ID
 
-            return StreamBuilder(
+          if (snapshot.hasData) {
+            return StreamBuilder<QuerySnapshot>(
               stream:
                   FirebaseFirestore.instance.collection('requests').snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
                 }
@@ -68,10 +63,21 @@ class _OtherOngoingReqState extends State<OtherOngoingReq> {
                     Map<String, dynamic> requestData =
                         requestDoc.data() as Map<String, dynamic>;
                     return Card(
-                      child: ListTile(
-                        leading: Icon(Icons.location_on),
-                        title: Text(requestData['destinationLocation']),
-                        subtitle: Text(requestData['sourceLocation']),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ConformReqPg(requestId: requestDoc.id),
+                            ),
+                          );
+                        },
+                        child: ListTile(
+                          leading: Icon(Icons.location_on),
+                          title: Text(requestData['destinationLocation']),
+                          subtitle: Text(requestData['sourceLocation']),
+                        ),
                       ),
                     );
                   }).toList(),
@@ -79,9 +85,7 @@ class _OtherOngoingReqState extends State<OtherOngoingReq> {
               },
             );
           } else {
-            return Center(
-                child: Text(
-                    'User not logged in')); // Handle case where user is not logged in
+            return Center(child: Text('User not logged in'));
           }
         },
       ),

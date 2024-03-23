@@ -1,24 +1,24 @@
-import google.generativeai as genai
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-import os
+import requests
 app = Flask(__name__)
-CORS(app)
-api_key = os.getenv('GOOGLE_GENAI_API_KEY')
-genai.configure(api_key=api_key)
-@app.route("/prompt", methods=["POST"])
-def prompt():
-    data = request.json
-    prompt = data.get("prompt", "")
 
-    if not prompt:
-        return jsonify({"error": "Prompt is required"}), 400
+@app.route('/get_data', methods=['GET'])
+def get_data():
+    gemini_api_key = 'YOUR_GEMINI_API_KEY'
+    gemini_api_url = 'GEMINI_API_URL_TO_GET_DATA'
 
-    try:
-        model = genai.GenerativeModel("gemini-pro")
+    headers = {
+        'Authorization': f'Bearer {gemini_api_key}'
+    }
 
-        response = model.generate_content(prompt)
+    response = requests.get(gemini_api_url, headers=headers)
 
-        return jsonify({"response": response.text})
-    except Exception as e:
-        return jsonify({"error": "Request failed"}), 500
+    if response.status_code == 200:
+        data = response.json()
+        # Process the data as needed
+        return jsonify(data)
+    else:
+        return jsonify({'error': 'Failed to fetch data'})
+
+if __name__ == '__main__':
+    app.run(debug=True)

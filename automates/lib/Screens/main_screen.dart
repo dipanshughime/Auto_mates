@@ -1,4 +1,5 @@
 import 'package:automates/Screens/login.dart';
+import 'package:automates/Screens/map.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:automates/Screens/Profile.dart';
@@ -19,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   int currentPage = 0;
   List<Widget> pages = [
     MyOrdersSender(),
-    OngoongReq(),
+    MapScreen(),
     RequestForm(),
   ];
 
@@ -36,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Aditya'),
+        title: const Text('Auto-mates'),
         actions: [
           IconButton(
             icon: Icon(Icons.exit_to_app),
@@ -54,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBar(
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'home'),
-          NavigationDestination(icon: Icon(Icons.chat), label: 'chat'),
+          NavigationDestination(icon: Icon(Icons.map), label: 'map'),
           NavigationDestination(icon: Icon(Icons.person), label: 'profile')
         ],
         onDestinationSelected: (int index) {
