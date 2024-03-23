@@ -1,3 +1,5 @@
+import 'package:automates/utils/qrScanner.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -14,11 +16,71 @@ class ConformReqPg extends StatefulWidget {
 class _ConformReqPgState extends State<ConformReqPg> {
   Map<String, dynamic> requestData = {};
   bool isLoading = true;
-
+  late List<String> users = [];
+  late int seats = 0;
+  late String currentUserID = "";
+  bool showInitialButton = true;
   @override
   void initState() {
     super.initState();
+    initializeCurrentUser();
     retrieveRequestData();
+    fetchUsersAndSeats();
+  }
+
+  void initializeCurrentUser() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        currentUserID = user.uid;
+      });
+    }
+  }
+
+  void addUserAndIncrementSeats(String userId) {
+    users.add(userId);
+    setState(() {
+      seats = seats + 1;
+    });
+
+    FirebaseFirestore.instance
+        .collection('requests')
+        .doc(widget.requestId)
+        .update({
+      'users': users,
+      'seats': seats,
+    }).then((value) {
+      fetchUsersAndSeats();
+    });
+  }
+
+  void fetchUsersAndSeats() {
+    FirebaseFirestore.instance
+        .collection('requests')
+        .doc(widget.requestId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        List<String> fetchedUsers =
+            List<String>.from(doc.data()?['users'] ?? []);
+        if (fetchedUsers.contains(currentUserID)) {
+          setState(() {
+            showInitialButton = false;
+          });
+        }
+        setState(() {
+          users = fetchedUsers;
+          seats = doc.data()?['seats'] ?? 0;
+        });
+      }
+    });
+  }
+
+  void openQRScannerCamera() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => QRScannerPage()),
+    );
   }
 
   void retrieveRequestData() {
@@ -110,6 +172,51 @@ class _ConformReqPgState extends State<ConformReqPg> {
                       title: Text('User ID'),
                       subtitle: Text(requestData['userId'].toString()),
                     ),
+                    DropdownButton<String>(
+                      value: null,
+                      items: users
+                          .map((user) =>
+                              DropdownMenuItem(value: user, child: Text(user)))
+                          .toList(),
+                      onChanged: (String? selectedUser) {
+                        // Handle dropdown selection if needed
+                      },
+                    ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     // Add current user ID to the array and increment seats count
+                    //     addUserAndIncrementSeats(currentUserID);
+                    //   },
+                    //   child: Text('Add Current User and Increment Seats'),
+                    // ),
+
+                    showInitialButton
+                        ? ElevatedButton(
+                            onPressed: () {
+                              addUserAndIncrementSeats(currentUserID);
+                              setState(() {
+                                showInitialButton = false;
+                              });
+                            },
+                            child: Text('Accept Ride request'),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  openQRScannerCamera();
+                                },
+                                child: Text('QR Scanner'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle location button click
+                                },
+                                child: Text('Location'),
+                              ),
+                            ],
+                          ),
                   ],
                 ),
               ),

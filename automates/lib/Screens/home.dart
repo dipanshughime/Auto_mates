@@ -67,7 +67,7 @@ class _MyOrderSender_State extends State<MyOrdersSender>
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const ProFile()), // Replace 'AnotherPage()' with the page you want to navigate to
+                                      const ProfilePage()), // Replace 'AnotherPage()' with the page you want to navigate to
                             );
                           },
                         )
@@ -99,7 +99,7 @@ class _MyOrderSender_State extends State<MyOrdersSender>
                     text: 'On Going Request',
                   ),
                   Tab(
-                    text: 'My incomplete request',
+                    text: 'My OnGoing request',
                   ),
                   Tab(
                     text: 'My complete request',
