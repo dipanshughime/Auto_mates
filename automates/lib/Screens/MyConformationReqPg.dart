@@ -1,19 +1,21 @@
+import 'package:automates/Screens/GenerateQR.dart';
 import 'package:automates/utils/qrScanner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
-class ConformReqPg extends StatefulWidget {
+class MyConformReqPg extends StatefulWidget {
   final String requestId;
 
-  const ConformReqPg({Key? key, required this.requestId}) : super(key: key);
+  const MyConformReqPg({Key? key, required this.requestId}) : super(key: key);
 
   @override
-  State<ConformReqPg> createState() => _ConformReqPgState();
+  State<MyConformReqPg> createState() => _MyConformReqPgState();
 }
 
-class _ConformReqPgState extends State<ConformReqPg> {
+class _MyConformReqPgState extends State<MyConformReqPg> {
   Map<String, dynamic> requestData = {};
   bool isLoading = true;
   late List<String> users = [];
@@ -37,22 +39,22 @@ class _ConformReqPgState extends State<ConformReqPg> {
     }
   }
 
-  void addUserAndIncrementSeats(String userId) {
-    users.add(userId);
-    setState(() {
-      seats = seats + 1;
-    });
+  // void addUserAndIncrementSeats(String userId) {
+  //   users.add(userId);
+  //   setState(() {
+  //     seats = seats + 1;
+  //   });
 
-    FirebaseFirestore.instance
-        .collection('requests')
-        .doc(widget.requestId)
-        .update({
-      'users': users,
-      'seats': seats,
-    }).then((value) {
-      fetchUsersAndSeats();
-    });
-  }
+  //   FirebaseFirestore.instance
+  //       .collection('requests')
+  //       .doc(widget.requestId)
+  //       .update({
+  //     'users': users,
+  //     'seats': seats,
+  //   }).then((value) {
+  //     fetchUsersAndSeats();
+  //   });
+  // }
 
   void fetchUsersAndSeats() {
     FirebaseFirestore.instance
@@ -76,13 +78,12 @@ class _ConformReqPgState extends State<ConformReqPg> {
     });
   }
 
-  void openQRScannerCamera() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => QRScannerPage(requestId: widget.requestId)),
-    );
-  }
+  // void openQRScannerCamera() {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => QRScannerPage()),
+  //   );
+  // }
 
   void retrieveRequestData() {
     FirebaseFirestore.instance
@@ -191,33 +192,17 @@ class _ConformReqPgState extends State<ConformReqPg> {
                     //   child: Text('Add Current User and Increment Seats'),
                     // ),
 
-                    showInitialButton
-                        ? ElevatedButton(
-                            onPressed: () {
-                              addUserAndIncrementSeats(currentUserID);
-                              setState(() {
-                                showInitialButton = false;
-                              });
-                            },
-                            child: Text('Accept Ride request'),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  openQRScannerCamera();
-                                },
-                                child: Text('QR Scanner'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Handle location button click
-                                },
-                                child: Text('Location'),
-                              ),
-                            ],
-                          ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) =>
+                                  QRCodeGenerator(orderId: widget.requestId)),
+                        );
+                      },
+                      child: Text('Show Open QR'),
+                    )
                   ],
                 ),
               ),

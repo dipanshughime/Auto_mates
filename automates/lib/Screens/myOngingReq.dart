@@ -1,3 +1,5 @@
+import 'package:automates/Screens/MyConformationReqPg.dart';
+import 'package:automates/Screens/myCompletedReq.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -69,10 +71,21 @@ class _MyOngoingReqState extends State<MyOngoingReq> {
                     Map<String, dynamic> requestData =
                         requestDoc.data() as Map<String, dynamic>;
                     return Card(
-                      child: ListTile(
-                        leading: Icon(Icons.location_on),
-                        title: Text(requestData['destinationLocation']),
-                        subtitle: Text(requestData['sourceLocation']),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MyConformReqPg(requestId: requestDoc.id),
+                            ),
+                          );
+                        },
+                        child: ListTile(
+                          leading: Icon(Icons.location_on),
+                          title: Text(requestData['destinationLocation']),
+                          subtitle: Text(requestData['sourceLocation']),
+                        ),
                       ),
                     );
                   }).toList(),
