@@ -1,3 +1,4 @@
+import 'package:automates/Screens/imagecam.dart';
 import 'package:automates/Screens/login.dart';
 import 'package:automates/Screens/map.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> pages = [
     MyOrdersSender(),
     MapScreen(),
-    RequestForm(),
+    ProfilePage(),
   ];
 
   void signOut() {
@@ -37,7 +38,10 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Auto-mates'),
+        title: const Text(
+          'Auto-mates',
+        ),
+        backgroundColor: Colors.white,
         actions: [
           IconButton(
             icon: Icon(Icons.exit_to_app),
@@ -46,11 +50,60 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
       body: pages[currentPage],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint('asdsads');
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end, // Align buttons evenly
+        children: [
+          SizedBox(
+            width: 160,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RequestForm(),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Create Request"),
+                    ),
+                    Icon(Icons.add),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 120,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ImageCam(),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Ask me"),
+                    ),
+                    Icon(Icons.chat_bubble_outline),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         destinations: const [

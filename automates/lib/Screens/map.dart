@@ -11,20 +11,35 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> _controller = Completer();
-  static const LatLng _center = const LatLng(45.521563, -122.677433);
+  LatLng _center = LatLng(45.521563, -122.677433);
 
   @override
   void initState() {
     super.initState();
+    getUserCurrentLocation();
   }
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
   }
 
+  Future<Position> getUserCurrentLocation() async {
+    var permission = await Geolocator.checkPermission();
+    print('the permission is $permission');
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever ||
+        permission == LocationPermission.unableToDetermine) {
+      await Geolocator.requestPermission().catchError((error) {
+        print("error: $error");
+      });
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: GoogleMap(
           onMapCreated: _onMapCreated,

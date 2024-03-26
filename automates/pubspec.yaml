@@ -46,6 +46,11 @@ dependencies:
   intl: ^0.19.0
   qr_code_scanner:
   qr_flutter:
+  weather: ^3.1.1 
+  image_picker: ^1.0.7
+  camera: ^0.10.5+9
+  google_gemini: ^0.1.2
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:
