@@ -1,3 +1,4 @@
+import 'package:automates/Screens/street_view.dart';
 import 'package:automates/utils/qrScanner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class ConformReqPg extends StatefulWidget {
 class _ConformReqPgState extends State<ConformReqPg> {
   Map<String, dynamic> requestData = {};
   bool isLoading = true;
+  var name = "";
   late List<String> users = [];
   late int seats = 0;
   late String currentUserID = "";
@@ -34,6 +36,23 @@ class _ConformReqPgState extends State<ConformReqPg> {
       setState(() {
         currentUserID = user.uid;
       });
+    }
+  }
+
+  Future<void> _loadUserName() async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUserID)
+          .get();
+      if (userSnapshot.exists) {
+        // Assuming 'name' is a field in the user document
+        setState(() {
+          name = userSnapshot['username'];
+        });
+      }
+    } catch (e) {
+      print('Error loading user name: $e');
     }
   }
 
@@ -212,6 +231,15 @@ class _ConformReqPgState extends State<ConformReqPg> {
                               ),
                               ElevatedButton(
                                 onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            StreetViewPanoramaInitDemo(
+                                                place: "VESIT",
+                                                lat: 19.0457275,
+                                                long: 72.8892177)),
+                                  );
                                   // Handle location button click
                                 },
                                 child: Text('Location'),

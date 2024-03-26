@@ -4,8 +4,25 @@ import 'package:automates/Screens/myCompletedReq.dart';
 import 'package:automates/Screens/myOngingReq.dart';
 import 'package:automates/Screens/otherOngingReq.dart';
 import 'package:automates/Screens/register.dart';
+import 'package:automates/Screens/weather.dart';
 import 'package:automates/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class Weather {
+  final double temperature;
+  final String description;
+
+  Weather({required this.temperature, required this.description});
+
+  factory Weather.fromJson(Map<String, dynamic> json) {
+    return Weather(
+      temperature: json['main']['temp'].toDouble(),
+      description: json['weather'][0]['main'],
+    );
+  }
+}
 
 class MyOrdersSender extends StatefulWidget {
   const MyOrdersSender({super.key});
@@ -17,11 +34,13 @@ class MyOrdersSender extends StatefulWidget {
 class _MyOrderSender_State extends State<MyOrdersSender>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late Weather _weather;
 
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this);
     super.initState();
+    //  _fetchWeather();
   }
 
   @override
@@ -29,6 +48,19 @@ class _MyOrderSender_State extends State<MyOrdersSender>
     DateTime timestamp = DateTime.now();
 
     super.dispose();
+  }
+
+  Future<void> _fetchWeather() async {
+    final response = await http.get(Uri.parse(
+        'http://api.openweathermap.org/data/2.5/weather?q=London&appid=4172e82b25bf2dff4705ae86499f6881'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      setState(() {
+        _weather = Weather.fromJson(data);
+      });
+    } else {
+      throw Exception('Failed to load weather data');
+    }
   }
 
   @override
@@ -43,40 +75,80 @@ class _MyOrderSender_State extends State<MyOrdersSender>
             Container(
               width: double.infinity,
               height: 170,
-              decoration: BoxDecoration(color: AppColors.header),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 60),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("User name",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.white,
-                            )),
-                        GestureDetector(
-                          onTap: () {
-                            // Navigate to another page when the image is tapped
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ProfilePage()), // Replace 'AnotherPage()' with the page you want to navigate to
-                            );
-                          },
-                        )
-                      ],
-                    ),
-                  ],
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'assets/images/auto.gif'), // Replace with your image path
+                  fit: BoxFit.cover, // Adjust the fit as needed
                 ),
               ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 60),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Text(
+                            //   "User name",
+                            //   textAlign: TextAlign.left,
+                            //   style: TextStyle(
+                            //     fontSize: 30,
+                            //     fontWeight: FontWeight.w800,
+                            //     color: AppColors.black,
+                            //   ),
+                            // ),
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //         builder: (context) => const WeatherScreen(),
+                            //       ),
+                            //     );
+                            //   },
+                            //   child: Text(
+                            //     "Check Weather",
+                            //     textAlign: TextAlign.left,
+                            //     style: TextStyle(
+                            //       fontSize: 20,
+                            //       fontWeight: FontWeight.w800,
+                            //       color: AppColors.white,
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WeatherScreen(),
+                          ),
+                        );
+                        // Handle button press
+                      },
+                      child:
+                          Icon(Icons.cloud), // Replace with your weather icon
+                      backgroundColor:
+                          Colors.blue, // Set button background color
+                    ),
+                  ),
+                ],
+              ),
             ),
+
             const SizedBox(
               height: 10,
             ),

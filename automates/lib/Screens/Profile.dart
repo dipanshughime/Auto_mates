@@ -1,3 +1,6 @@
+import 'package:automates/Screens/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -8,6 +11,34 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  late User? _currentUser;
+  var name = "";
+  @override
+  void initState() {
+    super.initState();
+    print("this is user: ");
+    _currentUser = FirebaseAuth.instance.currentUser;
+    print(_currentUser);
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .get();
+      if (userSnapshot.exists) {
+        // Assuming 'name' is a field in the user document
+        setState(() {
+          name = userSnapshot['username'];
+        });
+      }
+    } catch (e) {
+      print('Error loading user name: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,25 +51,29 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundImage: NetworkImage(
                 'https://cdn2.iconfinder.com/data/icons/avatars-60/5985/12-Delivery_Man-512.png'),
           ),
-          // ignore: duplicate_ignore
-          // ignore: prefer_const_constructors
           Padding(
             padding: EdgeInsets.only(top: 25, bottom: 10),
-            child: const Center(
-                child: Text(
-              "Hey Nikhil!",
-              style: TextStyle(
+            child: Center(
+              child: Text(
+                "Hey ${name ?? 'Nikhil'}!",
+                style: TextStyle(
                   color: Colors.black,
                   fontSize: 22,
-                  fontWeight: FontWeight.bold),
-            )),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
           Center(
-              child: Text(
-            "What a wonderful day!!",
-            style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400),
-          )),
+            child: Text(
+              "What a wonderful day!!",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
           Padding(
             padding: EdgeInsets.all(10),
             child: Divider(),
@@ -69,16 +104,24 @@ class _ProfilePageState extends State<ProfilePage> {
           Divider(),
           Center(
             child: TextButton(
-              onPressed: (() {
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+                print('User signed out successfully');
                 print("User logged out");
-              }),
+              },
               child: Text(
                 "Log Out",
-                style:
-                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

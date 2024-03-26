@@ -94,6 +94,7 @@ class _RequestFormState extends State<RequestForm> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Text('Request Form'),
