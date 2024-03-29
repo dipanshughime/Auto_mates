@@ -100,21 +100,34 @@ class _QRScannerPageState extends State<QRScannerPage> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('QR Code Scanned Successfully'),
-              content: Text('Confirmation message here'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Confirmation message here'),
+                  SizedBox(height: 20), // Add some space between text and image
+                  Image.asset(
+                    'assets/images/verified.gif', // Replace 'your_image.png' with your image asset path
+                    width: 100, // Adjust the width as needed
+                    height: 100, // Adjust the height as needed
+                    fit: BoxFit.cover, // Adjust the fit property as needed
+                  ),
+                ],
+              ),
             );
           },
         );
 
         // Delay for 5 seconds before navigating to home page
-        await Future.delayed(Duration(seconds: 5));
+        await Future.delayed(Duration(seconds: 7));
 
         // Navigate to home page
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ConformReqPg(
-                    requestId: widget.requestId,
-                  )),
+            builder: (context) => ConformReqPg(
+              requestId: widget.requestId,
+            ),
+          ),
         );
       } else {
         // If scanner doesn't match, navigate back

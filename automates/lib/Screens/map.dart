@@ -12,6 +12,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> _controller = Completer();
   LatLng _center = LatLng(45.521563, -122.677433);
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -23,7 +24,7 @@ class _MapScreenState extends State<MapScreen> {
     _controller.complete(controller);
   }
 
-  Future<Position> getUserCurrentLocation() async {
+  Future<void> getUserCurrentLocation() async {
     var permission = await Geolocator.checkPermission();
     print('the permission is $permission');
     if (permission == LocationPermission.denied ||
@@ -33,7 +34,11 @@ class _MapScreenState extends State<MapScreen> {
         print("error: $error");
       });
     }
-    return await Geolocator.getCurrentPosition();
+    final position = await Geolocator.getCurrentPosition();
+    setState(() {
+      _center = LatLng(position.latitude, position.longitude);
+      _isLoading = false;
+    });
   }
 
   @override
@@ -41,20 +46,24 @@ class _MapScreenState extends State<MapScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: _center,
-            zoom: 11.0,
-          ),
-          markers: Set<Marker>.of([
-            Marker(
-              markerId: MarkerId('user_location'),
-              position: _center,
-              infoWindow: InfoWindow(title: 'Your Location'),
-            ),
-          ]),
-        ),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: 11.0,
+                ),
+                markers: Set<Marker>.of([
+                  Marker(
+                    markerId: MarkerId('user_location'),
+                    position: _center,
+                    infoWindow: InfoWindow(title: 'Your Location'),
+                  ),
+                ]),
+              ),
       ),
     );
   }

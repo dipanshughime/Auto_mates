@@ -1,30 +1,35 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:automates/Screens/feedBack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:automates/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Feedback form test', (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: FeedbackForm(),
+    ));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify the presence of the form fields and submit button
+    expect(find.text('Name'), findsOneWidget);
+    expect(find.text('Email'), findsOneWidget);
+    expect(find.text('Feedback'), findsOneWidget);
+    expect(find.text('Submit'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Enter text into the name field
+    await tester.enterText(find.byType(TextField).first, 'John Doe');
+    // Enter text into the email field
+    await tester.enterText(find.byType(TextField).at(1), 'john@example.com');
+    // Enter text into the feedback field
+    await tester.enterText(
+        find.byType(TextField).last, 'This is a test feedback.');
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Tap the submit button
+    await tester.tap(find.text('Submit'));
+    await tester.pumpAndSettle();
+
+    // Verify that the feedback is printed to the console
+    expect(
+      tester.takeException(), // No error should be thrown
+      isNull,
+    );
   });
 }
