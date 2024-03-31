@@ -9,8 +9,8 @@ void main() {
     ));
 
     // Verify the presence of the form fields and submit button
-    expect(find.text('Name'), findsOneWidget);
-    expect(find.text('Email'), findsOneWidget);
+    expect(find.text('Namees'), findsOneWidget);
+    expect(find.text('Emails'), findsOneWidget);
     expect(find.text('Feedback'), findsOneWidget);
     expect(find.text('Submit'), findsOneWidget);
 

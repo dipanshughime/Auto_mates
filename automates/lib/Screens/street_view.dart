@@ -13,9 +13,12 @@ class StreetViewPanoramaInitDemo extends StatefulWidget {
   final double lat;
   final double long;
 
-  StreetViewPanoramaInitDemo(
-      {Key? key, required this.place, required this.lat, required this.long})
-      : super(key: key);
+  StreetViewPanoramaInitDemo({
+    Key? key,
+    required this.place,
+    required this.lat,
+    required this.long,
+  }) : super(key: key);
 
   @override
   State<StreetViewPanoramaInitDemo> createState() =>
@@ -185,13 +188,6 @@ class _StreetViewPanoramaInitDemoState
                                     color: Colors.amber,
                                   ),
                                 ),
-                                // Padding(
-                                //   padding: EdgeInsets.all(5.0),
-                                //   child: Text(
-                                //     widget.rating.toString(),
-                                //     style: TextStyle(color: Colors.white),
-                                //   ),
-                                // ),
                               ],
                             ),
                           ),

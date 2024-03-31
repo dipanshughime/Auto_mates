@@ -2,6 +2,7 @@ import 'package:automates/Screens/main_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class RequestForm extends StatefulWidget {
   @override
@@ -105,72 +106,109 @@ class _RequestFormState extends State<RequestForm> {
         appBar: AppBar(
           title: Text('Request Form'),
         ),
-        body: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Source Location'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter source location';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _sourceLocation = value!;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Destination Location'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter destination location';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _destinationLocation = value!;
-                },
-              ),
-              ListTile(
-                title: Text('Travel Date: ${_travelDateTime.toLocal()}'),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () {
-                  _selectDate(context);
-                },
-              ),
-              ListTile(
-                title: Text(
-                    'Travel Time: ${_travelDateTime.toLocal().hour}:${_travelDateTime.toLocal().minute}'),
-                trailing: Icon(Icons.access_time),
-                onTap: () {
-                  _selectTime(context);
-                },
-              ),
-              DropdownButtonFormField(
-                value: _selectedTransportOption,
-                items: ['Auto', 'Cab', 'Taxi']
-                    .map((transport) => DropdownMenuItem(
-                          value: transport,
-                          child: Text(transport),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedTransportOption = value!;
-                  });
-                },
-                decoration: InputDecoration(labelText: 'Transport Option'),
-              ),
-              FloatingActionButton(
-                onPressed: () => _submitForm(),
-                tooltip: 'Submit',
-                child: Icon(Icons.check),
-              ),
-            ],
+        body: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildRoundedInputField(
+                  labelText: 'Source Location',
+                  onSaved: (value) {
+                    _sourceLocation = value!;
+                  },
+                ),
+                SizedBox(height: 20),
+                _buildRoundedInputField(
+                  labelText: 'Destination Location',
+                  onSaved: (value) {
+                    _destinationLocation = value!;
+                  },
+                ),
+                SizedBox(height: 20),
+                ListTile(
+                  title: Text(
+                      'Travel Date: ${DateFormat('dd-MM-yyyy').format(_travelDateTime.toLocal())}'),
+                  trailing: Icon(Icons.calendar_today),
+                  onTap: () {
+                    _selectDate(context);
+                  },
+                ),
+                ListTile(
+                  title: Text(
+                      'Travel Time: ${_travelDateTime.toLocal().hour}:${_travelDateTime.toLocal().minute}'),
+                  trailing: Icon(Icons.access_time),
+                  onTap: () {
+                    _selectTime(context);
+                  },
+                ),
+                SizedBox(height: 20),
+                _buildRoundedDropdownButtonFormField(
+                  labelText: 'Transport Option',
+                  value: _selectedTransportOption,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedTransportOption = value!;
+                    });
+                  },
+                  items: ['Auto', 'Cab', 'Taxi'],
+                ),
+                SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () => _submitForm(),
+                    child: Text('Submit'),
+                  ),
+                ),
+              ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoundedInputField({
+    required String labelText,
+    required void Function(String?) onSaved,
+  }) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please enter $labelText';
+        }
+        return null;
+      },
+      onSaved: onSaved,
+    );
+  }
+
+  Widget _buildRoundedDropdownButtonFormField({
+    required String labelText,
+    required dynamic value,
+    required Function(dynamic) onChanged,
+    required List<String> items,
+  }) {
+    return DropdownButtonFormField(
+      value: value,
+      items: items.map((transport) {
+        return DropdownMenuItem(
+          value: transport,
+          child: Text(transport),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
     );
