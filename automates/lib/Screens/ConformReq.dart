@@ -236,9 +236,10 @@ class _ConformReqPgState extends State<ConformReqPg> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             StreetViewPanoramaInitDemo(
-                                                place: "VESIT",
-                                                lat: 19.0457275,
-                                                long: 72.8892177)),
+                                              place: "VESIT",
+                                              lat: 19.0501817,
+                                              long: 72.8884698,
+                                            )),
                                   );
                                   // Handle location button click
                                 },
